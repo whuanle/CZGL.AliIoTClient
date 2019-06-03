@@ -4,6 +4,9 @@ using System.Text;
 
 namespace CZGL.AliIoTClient
 {
+    /// <summary>
+    /// 连接服务器，返回代码
+    /// </summary>
     public enum ConnectCode
     {
         conn_accepted = 0x00,

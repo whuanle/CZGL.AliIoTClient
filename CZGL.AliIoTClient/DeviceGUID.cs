@@ -38,6 +38,7 @@ namespace CZGL.AliIoTClient
             }File.WriteAllText(dir + "/" + file, guid);
             return guid;
         }
+
         /// <summary>
         /// 生成GUID
         /// </summary>
