@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace CZGL.AliIoTClient
 {
     /// <summary>
-    /// Alin json
+    /// Alink json
     /// </summary>
     public class AliIoTClientJson
     {
