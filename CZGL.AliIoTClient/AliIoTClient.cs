@@ -47,9 +47,9 @@ namespace CZGL.AliIoTClient
         /// <summary>
         /// 已订阅的Topic列表
         /// </summary>
-        public string[] GetSubedList { get { return topicSubedList.ToArray(); } }
-        private List<string> topicSubedList = new List<string>();
+        public Dictionary<string,byte> GetSubedList { get {return topicSubedList; } }
 
+        private Dictionary<string, byte> topicSubedList = new Dictionary<string, byte>();
         OpenTopic openTopic = new OpenTopic();
 
         /// <summary>
@@ -128,9 +128,7 @@ namespace CZGL.AliIoTClient
                     QOS[i] = 0x00;
                 }
             }
-            topicSubedList = SubTopic.ToList();
-            // 订阅消息，若不指定Topic的QOS，则全部为 0
-            client.Subscribe(SubTopic, QOS);
+            TopicAdd(SubTopic,QOS);
             // 设置各种触发事件
             AddPublishEvent();
             // 建立连接
@@ -170,8 +168,7 @@ namespace CZGL.AliIoTClient
                 client = new MqttClient(connectOptions.targetServer);
                 client.ProtocolVersion = MqttProtocolVersion.Version_3_1_1;
                 // 订阅消息，若不指定Topic的QOS，则全部为 0
-                topicSubedList = topics.ToList();
-                client.Subscribe(topics, QOS);
+                TopicAdd(topics,QOS);
                 // 设置各种触发事件
                 AddPublishEvent();
                 // 建立连接
@@ -221,10 +218,32 @@ namespace CZGL.AliIoTClient
                     QOS[i] = 0x00;
                 }
             }
-            List<string> topicsAddList = topics.ToList();
-            topicSubedList.AddRange(topicsAddList);
-            topicSubedList = topicSubedList.Distinct().ToList();
-            client.Subscribe(GetSubedList, QOS);
+
+            for (int i=0;i<topics.Length;i++)
+            {
+                if (topicSubedList.ContainsKey(topics[i]))
+                {
+                    topicSubedList[topics[i]] = QOS[i];
+                    continue;
+                }
+                topicSubedList.Add(topics[i],QOS[i]);
+            }
+
+            string[] topiclist = new string[topicSubedList.Count];
+            byte[] topicQos = new byte[topicSubedList.Count];
+
+            int n = 0;
+            foreach (var item in topicSubedList.Keys)
+            {
+                topiclist[n] = item;
+                n+=1;
+            }
+            n = 0;
+            foreach (var item in topicSubedList.Values)
+            {
+                topicQos[n] = item;
+            }
+            client.Subscribe(topiclist, topicQos);
         }
         /// <summary>
         /// 移除已经订阅的Topic
@@ -232,18 +251,11 @@ namespace CZGL.AliIoTClient
         /// <param name="topics"></param>
         public void TopicRemove(string[] topics)
         {
-            /*
-             Unsubscribe还是subscribe比较好，在测试中
-             */
-            //client.Subscribe(GetSubedList,QOS);
-
             client.Unsubscribe(topics);
-            topicSubedList = topicSubedList.Distinct().ToList();
             foreach (var item in topics)
             {
                 topicSubedList.Remove(item);
             }
-
         }
 
         #endregion
@@ -923,9 +935,8 @@ namespace CZGL.AliIoTClient
         /// <summary>
         /// 已订阅的Topic列表
         /// </summary>
-        public string[] GetSubedList { get { return topicSubedList.ToArray(); } }
-        private List<string> topicSubedList = new List<string>();
-
+        public Dictionary<string, byte> GetSubedList { get { return topicSubedList; } }
+        private Dictionary<string, byte> topicSubedList = new Dictionary<string, byte>();
         OpenTopic openTopic = new OpenTopic();
         //是否已经连接
         public bool isConnected
@@ -1001,9 +1012,7 @@ namespace CZGL.AliIoTClient
                     QOS[i] = 0x00;
                 }
             }
-            topicSubedList = SubTopic.ToList();
-            // 订阅消息，若不指定Topic的QOS，则全部为 0
-            client.Subscribe(SubTopic, QOS);
+            TopicAdd(SubTopic, QOS);
             // 设置各种触发事件
             AddPublishEvent();
             // 建立连接
@@ -1043,8 +1052,7 @@ namespace CZGL.AliIoTClient
                 client = new MqttClient(connectOptions.targetServer);
                 client.ProtocolVersion = MqttProtocolVersion.Version_3_1_1;
                 // 订阅消息，若不指定Topic的QOS，则全部为 0
-                topicSubedList = topics.ToList();
-                client.Subscribe(topics, QOS);
+                TopicAdd(topics, QOS);
                 // 设置各种触发事件
                 AddPublishEvent();
                 // 建立连接
@@ -1094,10 +1102,32 @@ namespace CZGL.AliIoTClient
                     QOS[i] = 0x00;
                 }
             }
-            List<string> topicsAddList = topics.ToList();
-            topicSubedList.AddRange(topicsAddList);
-            topicSubedList = topicSubedList.Distinct().ToList();
-            client.Subscribe(GetSubedList, QOS);
+
+            for (int i = 0; i < topics.Length; i++)
+            {
+                if (topicSubedList.ContainsKey(topics[i]))
+                {
+                    topicSubedList[topics[i]] = QOS[i];
+                    continue;
+                }
+                topicSubedList.Add(topics[i], QOS[i]);
+            }
+
+            string[] topiclist = new string[topicSubedList.Count];
+            byte[] topicQos = new byte[topicSubedList.Count];
+
+            int n = 0;
+            foreach (var item in topicSubedList.Keys)
+            {
+                topiclist[n] = item;
+                n += 1;
+            }
+            n = 0;
+            foreach (var item in topicSubedList.Values)
+            {
+                topicQos[n] = item;
+            }
+            client.Subscribe(topiclist, topicQos);
         }
         /// <summary>
         /// 移除已经订阅的Topic
@@ -1105,21 +1135,15 @@ namespace CZGL.AliIoTClient
         /// <param name="topics"></param>
         public void TopicRemove(string[] topics)
         {
-            /*
-             Unsubscribe还是subscribe比较好，在测试中
-             */
-            //client.Subscribe(GetSubedList,QOS);
-
             client.Unsubscribe(topics);
-            topicSubedList = topicSubedList.Distinct().ToList();
             foreach (var item in topics)
             {
                 topicSubedList.Remove(item);
             }
-
         }
 
         #endregion
+
 
 
         #region 发布与响应
