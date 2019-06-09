@@ -2,11 +2,21 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>CZGL.AliIoTClient for preview1</Description>
+    <Description>CZGL.AliIoTClient for 1.1.0</Description>
     <Copyright>痴者工良</Copyright>
     <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl>https://github.com/whuanle/CZGL.AliIoTClient</RepositoryUrl>
-    <PackageReleaseNotes>基于.NET Core Standard的阿里云物联网客户端</PackageReleaseNotes>
+    <PackageReleaseNotes>基于.NET Standard 的阿里云物联网客户端</PackageReleaseNotes>
+    <Authors>痴者工良</Authors>
+    <Company>痴者工良</Company>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <NeutralLanguage></NeutralLanguage>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>CZGL.AliIoTClient.pfx</AssemblyOriginatorKeyFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -15,7 +25,8 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
-    <DocumentationFile></DocumentationFile>
+    <DocumentationFile>E:\阿里云IOT\CZGL.AliIoTClient\CZGL.AliIoTClient\CZGL.AliIoTClient.xml</DocumentationFile>
+    <Optimize>false</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
