@@ -42,15 +42,15 @@ namespace CZGL.AliIoTClient
         // 通讯连接有关
         ConnectOptions connectOptions;
         //MQTT通讯客户端
-        MqttClient client;
+        private MqttClient client;
 
         /// <summary>
         /// 已订阅的Topic列表
         /// </summary>
-        public Dictionary<string,byte> GetSubedList { get {return topicSubedList; } }
+        public Dictionary<string, byte> GetSubedList { get { return topicSubedList; } }
 
-        private Dictionary<string, byte> topicSubedList = new Dictionary<string, byte>();
-        OpenTopic openTopic = new OpenTopic();
+        private Dictionary<string, byte> topicSubedList;
+        private OpenTopic openTopic = new OpenTopic();
 
         /// <summary>
         /// 是否与服务器保持连接
@@ -80,6 +80,7 @@ namespace CZGL.AliIoTClient
             user = new MQTTUser();
             client = new MqttClient(connectOptions.targetServer);
             client.ProtocolVersion = MqttProtocolVersion.Version_3_1_1;
+            topicSubedList = new Dictionary<string, byte>();
             Init();
         }
 
@@ -128,7 +129,7 @@ namespace CZGL.AliIoTClient
                     QOS[i] = 0x00;
                 }
             }
-            TopicAdd(SubTopic,QOS);
+            TopicAdd(SubTopic, QOS);
             // 设置各种触发事件
             AddPublishEvent();
             // 建立连接
@@ -168,7 +169,7 @@ namespace CZGL.AliIoTClient
                 client = new MqttClient(connectOptions.targetServer);
                 client.ProtocolVersion = MqttProtocolVersion.Version_3_1_1;
                 // 订阅消息，若不指定Topic的QOS，则全部为 0
-                TopicAdd(topics,QOS);
+                TopicAdd(topics, QOS);
                 // 设置各种触发事件
                 AddPublishEvent();
                 // 建立连接
@@ -219,14 +220,14 @@ namespace CZGL.AliIoTClient
                 }
             }
 
-            for (int i=0;i<topics.Length;i++)
+            for (int i = 0; i < topics.Length; i++)
             {
                 if (topicSubedList.ContainsKey(topics[i]))
                 {
                     topicSubedList[topics[i]] = QOS[i];
                     continue;
                 }
-                topicSubedList.Add(topics[i],QOS[i]);
+                topicSubedList.Add(topics[i], QOS[i]);
             }
 
             string[] topiclist = new string[topicSubedList.Count];
@@ -236,7 +237,7 @@ namespace CZGL.AliIoTClient
             foreach (var item in topicSubedList.Keys)
             {
                 topiclist[n] = item;
-                n+=1;
+                n += 1;
             }
             n = 0;
             foreach (var item in topicSubedList.Values)
@@ -577,15 +578,25 @@ namespace CZGL.AliIoTClient
 
         #region 设备服务调用
 
-        public void OpenServicePostRaw()
+        /// <summary>
+        /// 允许服务器调用某个服务,已经无效
+        /// </summary>
+        /// <param name="serviceName">服务名称</param>
+        [Obsolete]
+        public void OpenServicePostRaw(string serviceName)
         {
             openTopic.ServicePostRaw = true;
-            TopicAdd(new string[] { thingAddress.serviceTopic.identifier });
+            TopicAdd(new string[] { thingAddress.serviceTopic.identifier + serviceName });
         }
-        public void CloseServicePostRaw()
+        /// <summary>
+        /// 移除某个服务，已经无效
+        /// </summary>
+        /// <param name="serviceName">服务名称</param>
+        [Obsolete]
+        public void CloseServicePostRaw(string serviceName)
         {
             openTopic.ServicePostRaw = false;
-            TopicRemove(new string[] { thingAddress.serviceTopic.identifier });
+            TopicRemove(new string[] { thingAddress.serviceTopic.identifier + serviceName });
         }
 
         /// <summary>
@@ -594,13 +605,13 @@ namespace CZGL.AliIoTClient
         /// <param name="content"></param>
         /// <param name="isToLower">是否转为小写</param>
         /// <returns></returns>
-        public int Thing_Service_Identifier_Reply(ServiceReplyModel model, bool isToLower = true)
+        public int Thing_Service_Identifier_Reply<TModel>(TModel model, string serviceName, bool isToLower = true)
         {
             string json = JsonConvert.SerializeObject(model);
             if (isToLower == true)
                 json = json.ToLower();
 
-            int id = PublishToServer(thingAddress.serviceTopic.identifier_reply, json, Encoding.UTF8);
+            int id = PublishToServer(thingAddress.serviceTopic.identifier_reply + serviceName + "_reply", json, Encoding.UTF8);
             return id;
         }
 
@@ -610,16 +621,26 @@ namespace CZGL.AliIoTClient
         /// <param name="content"></param>
         /// <param name="isToLower">是否转为小写</param>
         /// <returns></returns>
-        public int Thing_Service_Identifier_Reply(ServiceReplyModel model, bool isToLower = true, Encoding encoding = null)
+        public int Thing_Service_Identifier_Reply<TModel>(TModel model, string serviceName, bool isToLower = true, Encoding encoding = null)
         {
             string json = JsonConvert.SerializeObject(model);
             if (isToLower == true)
                 json = json.ToLower();
             if (encoding == null) encoding = Encoding.UTF8;
-            int id = PublishToServer(thingAddress.serviceTopic.identifier_reply, json, encoding);
+            int id = PublishToServer(thingAddress.serviceTopic.identifier_reply + serviceName, json, encoding);
             return id;
         }
-
+        /// <summary>
+        /// 将收到的服务调用的参数转为模型
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <param name="Alinkjson"></param>
+        /// <returns></returns>
+        public TModel Thing_Service_JsonToObject<TModel>(string Alinkjson)
+        {
+            TModel model = JsonConvert.DeserializeObject<TModel>(Alinkjson);
+            return model;
+        }
 
         #endregion
 
@@ -880,7 +901,7 @@ namespace CZGL.AliIoTClient
         /// 获取是否接收指令或接收响应
         /// </summary>
         /// <returns></returns>
-        public OpenTopic getOpenTopic()
+        public OpenTopic GetOpenTopic()
         {
             OpenTopic open = new OpenTopic();
             open.PropertyUpRawReplyTopic = openTopic.PropertyUpRawReplyTopic;
@@ -1384,7 +1405,7 @@ namespace CZGL.AliIoTClient
 
         #region 设备服务调用
 
-        
+
         public void OpenServiceDownRaw()
         {
             openTopic.ServiceDownRaw = true;
@@ -1642,7 +1663,7 @@ namespace CZGL.AliIoTClient
         /// 获取是否接收指令或接收响应
         /// </summary>
         /// <returns></returns>
-        public OpenTopic getOpenTopic()
+        public OpenTopic GetOpenTopic()
         {
             OpenTopic open = new OpenTopic();
             open.PropertyUpRawReplyTopic = openTopic.PropertyUpRawReplyTopic;

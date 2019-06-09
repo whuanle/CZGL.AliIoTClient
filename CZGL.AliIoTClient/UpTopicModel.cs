@@ -151,8 +151,8 @@ namespace CZGL.AliIoTClient
 
             public ServiceTopic(string productKey, string deviceName)
             {
-                identifier = $"/sys/{productKey}/{deviceName}/thing/service/" + "{tsl.service.identifier}";
-                identifier_reply = $"/sys/{productKey}/{deviceName}/thing/service/" + "{tsl.service.identifier}_reply";
+                identifier = $"/sys/{productKey}/{deviceName}/thing/service/";//   + "{tsl.service.identifier}";
+                identifier_reply = $"/sys/{productKey}/{deviceName}/thing/service/";    // + "{tsl.service.identifier}_reply";
             }
         }
 

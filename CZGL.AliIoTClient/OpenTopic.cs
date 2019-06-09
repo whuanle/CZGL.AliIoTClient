@@ -38,10 +38,12 @@ namespace CZGL.AliIoTClient
         /// <summary>
         /// 接收服务器调用服务，透传
         /// </summary>
+        [Obsolete]
         public bool ServiceDownRaw { get; set; }
         /// <summary>
         /// 接收服务器调用服务，Alink json
         /// </summary>
+        [Obsolete]
         public bool ServicePostRaw { get; set; }
     }
 }
