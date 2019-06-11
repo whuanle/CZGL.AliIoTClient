@@ -11,3 +11,7 @@ documentation address：https://www.cnblogs.com/whuanle/
 不多说什么，看一下 Wiki 就知道是干嘛的了。
 
 使用 Apache Licence 2.0 开源许可证
+
+
+开发这个东西，是为了兴趣。
+另外，可以加个学分。。。
